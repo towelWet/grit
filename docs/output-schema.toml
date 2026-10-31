@@ -1,0 +1,136 @@
+# output-schema.toml — the `--format toml` contract for every command that supports it.
+# Why: scripts parse these keys, so names are frozen. Keys may be ADDED in later versions; existing keys are never renamed or removed.
+# Each top-level table below is one command's example. Values are real output captured from the binary.
+# Ids are full 64-character lowercase hex. Times are RFC 3339 UTC. "absent" means the key is not written at all.
+
+# ---------------------------------------------------------------- status
+# Command: grit status --format toml [--path P]
+# Lists differences between HEAD and the working tree. Empty lists mean "clean".
+[status_example]
+repository_root = "/path/to/repo"       # absolute path of the repository root
+branch = "main"                         # current branch name; "" when HEAD names none
+changed_files = ["a.txt"]               # every changed path, sorted
+added_files = []                        # status "added"
+modified_files = ["a.txt"]              # status "modified"
+deleted_files = []                      # status "deleted"
+renamed_files = []                      # entries of the form "old -> new"
+
+# ---------------------------------------------------------------- snapshot / save
+# Command: grit snapshot --format toml -m MESSAGE [--path P] [--metadata K=V]
+# Two shapes. Both carry the changed-path keys shown in status.
+
+[snapshot_saved]                        # a commit was written
+repository_root = "/path/to/repo"
+snapshot_id = "eb52cc6ac60f9a2d3980461c118515a21ded19b56765264747ebc6e65a74da5e"  # the commit created (current HEAD)
+parent_snapshot_id = "6077399a62feff0a3d24e3b84120ff79fc80a3188f46dd5962db244e85e86f8f"  # absent on the first snapshot
+branch = "main"
+changed_files = ["a.txt", "src", "src/b.txt"]
+added_files = ["a.txt", "src", "src/b.txt"]
+modified_files = []
+deleted_files = []
+renamed_files = []
+object_count = 6                        # objects newly written for this snapshot
+bytes_added = 456                       # raw size of those objects
+bytes_reused = 0                        # raw size of objects that already existed
+verification_status = "ok"
+transaction_id = "20261015222004704070000-save"
+saved = true                            # added: a commit was written
+id = "eb52cc6ac60f9a2d3980461c118515a21ded19b56765264747ebc6e65a74da5e"  # added: the new commit id (same as snapshot_id)
+files = 3                               # added: number of changed paths (the same count the human text reports)
+
+[snapshot_nothing_to_save]              # nothing changed: no commit, no tree, no objects
+repository_root = "/path/to/repo"
+snapshot_id = "eb52cc6ac60f9a2d3980461c118515a21ded19b56765264747ebc6e65a74da5e"  # current HEAD, unchanged; "" if no commit exists yet
+parent_snapshot_id = "eb52cc6ac60f9a2d3980461c118515a21ded19b56765264747ebc6e65a74da5e"
+branch = "main"
+changed_files = []
+added_files = []
+modified_files = []
+deleted_files = []
+renamed_files = []
+object_count = 0
+bytes_added = 0
+bytes_reused = 0
+verification_status = "ok"
+transaction_id = "20261015222004851439000-save"
+saved = false                           # added: no commit was written; the id key is absent
+files = 0
+
+# ---------------------------------------------------------------- diff
+# Command: grit diff --format toml [A B]   (no arguments: working tree against HEAD)
+[diff_example]
+files_changed = 1
+lines_added = 1
+lines_deleted = 1
+
+[[diff_example.entries]]
+path = "a.txt"
+status = "modified"                     # added | deleted | modified
+old_hash = "6077399a62feff0a3d24e3b84120ff79fc80a3188f46dd5962db244e85e86f8f"   # absent for added
+new_hash = "343e9f0b7f5e921a0095a9ff88e8e24a3f38a614e3bea496da1dcf3934fb8dcf"   # absent for deleted
+old_size = 4                            # bytes; absent for added
+new_size = 4                            # bytes; absent for deleted
+lines_added = 1                         # absent for binary files
+lines_deleted = 1                       # absent for binary files
+patch = """
+--- a/a.txt
++++ b/a.txt
+-one
++two
+"""                                     # absent for binary files
+
+# ---------------------------------------------------------------- log
+# Command: grit log --format toml [--limit N]   Newest first.
+[[log_example.entries]]
+hash = "eb52cc6ac60f9a2d3980461c118515a21ded19b56765264747ebc6e65a74da5e"
+author = "user"
+message = "first"
+timestamp = "2026-10-15T22:20:04.796022+00:00"
+
+# ---------------------------------------------------------------- show
+# Command: grit show [REV] --format toml
+# Existing keys, unchanged: hash, tree, parents, author, message, timestamp.
+
+# ---------------------------------------------------------------- restore
+# Command: grit restore REV --format toml [--path P] [--force] [--no-safety-save]
+# Prints ONE document: the plan, then the outcome. Key names are unchanged; the last two keys are added.
+[restore_example]
+create = []                             # paths that will be created
+overwrite = ["a.txt"]                   # paths whose content will be replaced
+remove = []                             # paths that will be deleted
+unchanged = ["src", "src/b.txt"]        # paths already equal to the target
+restored = true                         # added: true only when --force ran the restore
+snapshot_id = "eb52cc6ac60f9a2d3980461c118515a21ded19b56765264747ebc6e65a74da5e"  # added: the full id of the target snapshot
+
+# ---------------------------------------------------------------- verify
+# Command: grit verify --format toml     Added in this version. Human output is unchanged.
+[verify_example]
+total_objects = 6                       # object files on disk
+valid = 6                               # objects that decompress and hash to their own names
+corrupt = 0                             # objects that fail; a nonzero value makes the command exit 65
+reachable = 5                           # objects referenced from a branch or tag
+unreachable = 1                         # objects no branch or tag references (gc removes them)
+ok = true                               # added: corrupt == 0, mirrors the exit code
+errors = []                             # one message per corrupt object
+
+# ---------------------------------------------------------------- branch
+# Command: grit branch --format toml               (list)
+# Command: grit branch create NAME --format toml   (create)
+[branch_list_example]                   # added: whole output is new for TOML
+current = "main"                        # "" when HEAD names no branch
+branches = ["main", "topic"]
+
+[branch_create_example]                 # added: whole output is new for TOML
+created = "topic"                       # the branch created
+hash = "eb52cc6ac60f9a2d3980461c118515a21ded19b56765264747ebc6e65a74da5e"  # full id it points at
+
+# ---------------------------------------------------------------- tag
+# Command: grit tag --format toml                    (list)
+# Command: grit tag create NAME [REV] --format toml  (create)
+[[tag_list_example.tags]]               # added: one table per tag
+name = "v1"
+hash = "eb52cc6ac60f9a2d3980461c118515a21ded19b56765264747ebc6e65a74da5e"
+
+[tag_create_example]                    # added: whole output is new for TOML
+name = "v1"
+hash = "eb52cc6ac60f9a2d3980461c118515a21ded19b56765264747ebc6e65a74da5e"  # full id; human output shows the short form

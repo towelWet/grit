@@ -1,0 +1,22 @@
+[workspace]
+members = ["crates/grit-engine", "crates/grit-cli"]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+license = "MIT"
+authors = ["time"]
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+blake3 = "1.8"
+thiserror = "2"
+rayon = "1"
+walkdir = "2"
+globset = "0.4"
+zstd = "0.13"
+tempfile = "3"
+chrono = { version = "0.4", features = ["serde"] }
+hex = "0.4"

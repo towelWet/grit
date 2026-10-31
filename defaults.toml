@@ -1,0 +1,4 @@
+[grit] version = 1
+[core] hash = "blake3" compression = "zstd" compression_level = 3
+[save] exclude = [".grit/",".git/","target/","node_modules/",".DS_Store"]
+[restore] safety_save = true confirm_overwrite = true
