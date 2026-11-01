@@ -8,7 +8,7 @@ agents change files freely, with a guaranteed way back.
 
 Grit coexists with Git. It never reads, converts, or replaces `.git`.
 
-![Grit saving, diffing, and verifying small demo project](docs/images/grit.png)
+![Grit status, history, and verify running on its own source](docs/images/grit.png)
 
 > **Status:** `0.1.0`, storage foundation. This README describes only what the
 > current binary does. Planned work (Lanes, Grains, Reviews, Receipts, Forge
