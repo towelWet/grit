@@ -1,41 +1,28 @@
 use std::path::{Path, PathBuf};
 pub const GRIT_DIR: &str = ".grit";
-pub fn grit_dir(r: &Path) -> PathBuf {
-    r.join(GRIT_DIR)
-}
-pub fn objects_dir(r: &Path) -> PathBuf {
-    grit_dir(r).join("objects")
-}
-pub fn refs_dir(r: &Path) -> PathBuf {
-    grit_dir(r).join("refs")
-}
-pub fn heads_dir(r: &Path) -> PathBuf {
-    refs_dir(r).join("heads")
-}
-pub fn tags_dir(r: &Path) -> PathBuf {
-    refs_dir(r).join("tags")
-}
-pub fn snapshots_dir(r: &Path) -> PathBuf {
-    refs_dir(r).join("snapshots")
-}
-pub fn journal_dir(r: &Path) -> PathBuf {
-    grit_dir(r).join("journal")
-}
-pub fn transactions_dir(r: &Path) -> PathBuf {
-    grit_dir(r).join("transactions")
-}
-pub fn tmp_dir(r: &Path) -> PathBuf {
-    grit_dir(r).join("tmp")
-}
-pub fn logs_dir(r: &Path) -> PathBuf {
-    grit_dir(r).join("logs")
-}
-pub fn config_path(r: &Path) -> PathBuf {
-    grit_dir(r).join("config.toml")
-}
-pub fn head_path(r: &Path) -> PathBuf {
-    grit_dir(r).join("HEAD")
-}
-pub fn lock_path(r: &Path) -> PathBuf {
-    grit_dir(r).join("lock")
-}
+mod grit_dir;
+pub use grit_dir::grit_dir;
+mod objects_dir;
+pub use objects_dir::objects_dir;
+mod refs_dir;
+pub use refs_dir::refs_dir;
+mod heads_dir;
+pub use heads_dir::heads_dir;
+mod tags_dir;
+pub use tags_dir::tags_dir;
+mod snapshots_dir;
+pub use snapshots_dir::snapshots_dir;
+mod journal_dir;
+pub use journal_dir::journal_dir;
+mod transactions_dir;
+pub use transactions_dir::transactions_dir;
+mod tmp_dir;
+pub use tmp_dir::tmp_dir;
+mod logs_dir;
+pub use logs_dir::logs_dir;
+mod config_path;
+pub use config_path::config_path;
+mod head_path;
+pub use head_path::head_path;
+mod lock_path;
+pub use lock_path::lock_path;

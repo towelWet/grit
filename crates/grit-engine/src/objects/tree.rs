@@ -20,16 +20,6 @@ pub struct TreeEntry {
 pub struct Tree {
     pub entries: BTreeMap<String, TreeEntry>,
 }
-impl Tree {
-    pub fn new(e: BTreeMap<String, TreeEntry>) -> Self {
-        Self { entries: e }
-    }
-    pub fn empty() -> Self {
-        Self {
-            entries: BTreeMap::new(),
-        }
-    }
-    pub fn entry(&self, name: &str) -> Option<&TreeEntry> {
-        self.entries.get(name)
-    }
-}
+mod new;
+mod empty;
+mod entry;
