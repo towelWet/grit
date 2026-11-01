@@ -108,12 +108,12 @@ any previous binary goes to `~/.Trash` instead of being overwritten.
 
 **Skill repo:** [towelWet/grit-skill](https://github.com/towelWet/grit-skill) — Claude Code skill holding design spec, AI verb layer, and storage philosophy.
 
-## License
-
-MIT. See [LICENSE](LICENSE).
-
 ## Keeping snapshots fast
 
 List folders to skip in `.gritignore` at repo root: one pattern per line, `#` for comments.
 `.build`, `.build-tmp`, `.venv`, `__pycache__`, and `node_modules` are always skipped, at any depth.
 A file edited or deleted during a snapshot is saved as it was read, and never fails the snapshot.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
