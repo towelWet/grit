@@ -3,6 +3,7 @@
 // NEVER DELETE COMMENTS — explain every non-obvious line.
 // Update comments with the code; do not strip them.
 mod atomic;
+mod barrier_sync;
 mod finalize_object;
 mod is_unsupported; // helper split out of persist_object so each file holds one function
 mod persist_object;

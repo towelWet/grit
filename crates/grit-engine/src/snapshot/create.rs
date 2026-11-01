@@ -8,21 +8,21 @@ use super::dirty_dirs::dirty_dirs;
 use super::no_change_result::no_change_result;
 use super::persist::{persist_commit, persist_tree};
 use super::prepare::prepare;
-use super::store_kept::store_kept;
+use super::store_changed::store_changed;
 use super::types::{ObjectStats, SnapshotOptions, SnapshotResult};
 use crate::store::lock::Lock;
 use crate::Result;
 
 pub fn create_snapshot(opts: &SnapshotOptions) -> Result<SnapshotResult> {
     let _lock = Lock::acquire(opts.root)?; // one writer at a time; released when this function returns
-    let prepared = prepare(opts)?;
+    let mut prepared = prepare(opts)?;
     let (added, modified, deleted, renamed) = classify(&prepared.old, &prepared.new);
     let changed_files = collect_changed(&added, &modified, &deleted, &renamed); // one list for commit and journal
     if changed_files.is_empty() {
         prepared.index.save(opts.root)?; // the cache still refreshes; no history entry is needed
         return Ok(no_change_result(ObjectStats::default())); // a clean tree writes no objects and records nothing
     }
-    let mut stats = store_kept(opts.root, &prepared.kept)?; // only now do the changed objects get written
+    let mut stats = store_changed(opts.root, &mut prepared)?; // only now do the changed objects get written
     let dirty = dirty_dirs(&prepared.old, &prepared.new); // directories whose trees must be rewritten
     let tree_hash = persist_tree(opts.root, &prepared.new, &dirty, prepared.old_root, &mut stats)?;
     let (commit_hash, branch) = persist_commit(

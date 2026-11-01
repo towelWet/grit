@@ -14,7 +14,10 @@ mod parent_root;
 mod persist;
 mod prepare;
 mod scan_scope;
+mod apply_raced;
+mod store_changed;
 mod store_entry;
+mod store_file;
 mod store_kept;
 mod types;
 

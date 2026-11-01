@@ -7,10 +7,13 @@ use std::path::Path;
 impl GritConfig {
     pub fn load(root: &Path) -> Result<Self> {
         let path = config_path(root);
-        if !path.exists() {
-            return Ok(Self::default());
-        }
-        Ok(toml::from_str(&fs::read_to_string(path)?)?)
+        let mut config: Self = if path.exists() {
+            toml::from_str(&fs::read_to_string(path)?)?
+        } else {
+            Self::default()
+        };
+        config.save.exclude.extend(super::gritignore::gritignore(root)); // memory only: init alone calls save
+        Ok(config)
     }
 
     pub fn save(&self, root: &Path) -> Result<()> {

@@ -1,4 +1,5 @@
 mod defaults;
+mod gritignore;
 mod io;
 mod model;
 

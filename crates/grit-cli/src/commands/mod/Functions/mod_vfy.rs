@@ -2,13 +2,14 @@
 // Why: automation needs the same counts as structured keys, and a nonzero corrupt count must still fail the command.
 // NEVER DELETE COMMENTS — explain every non-obvious line.
 // Update comments with the code; do not strip them.
-fn vfy(root: &Path, fmt: &str) -> CmdResult {
+fn vfy(root: &Path, full: bool, fmt: &str) -> CmdResult {
     let r = Repository::open(root)?;
-    let res = verify::verify(&r.root)?;
+    let res = verify::verify(&r.root, full)?;
     if fmt == "toml" {
         println!("{}", report::format_toml(&serde_json::json!({
             "total_objects": res.total_objects,
             "valid": res.valid,
+            "cached": res.cached,
             "corrupt": res.corrupt,
             "reachable": res.reachable,
             "unreachable": res.unreachable,
@@ -20,6 +21,9 @@ fn vfy(root: &Path, fmt: &str) -> CmdResult {
             "Objects: {} total, {} valid, {} corrupt. Reachable: {}, Orphans: {}",
             res.total_objects, res.valid, res.corrupt, res.reachable, res.unreachable
         );
+        if res.cached > 0 {
+            println!("{} already proven, not reread. Use --full to reread all.", res.cached); // honest about scope
+        }
         for e in &res.errors {
             eprintln!("  corrupt: {e}") // human form sends details to stderr, as before
         }

@@ -25,7 +25,7 @@ pub fn dispatch(args: &GritArgs) -> CmdResult {
         Command::Tag {
             sub: TagSub::Create { name, hash },
         } => tag_create(root, name, hash, &args.format),
-        Command::Verify => vfy(root, &args.format),
+        Command::Verify => vfy(root, args.full, &args.format),
         Command::Gc => gc(root),
         Command::Doctor => doctor(root),
     }

@@ -12,6 +12,7 @@
             snapshot_b: None,
             limit: 20,
             metadata: Vec::new(),
+            full: false,
             no_safety_save: false,
             branch_name: None,
         }

@@ -13,7 +13,7 @@ use std::path::Path;
 
 pub fn gc(root: &Path) -> Result<GcResult> {
     let _lock = Lock::acquire(root)?;
-    let verification = crate::verify::verify(root)?;
+    let verification = crate::verify::verify(root, true)?;
     if verification.corrupt > 0 {
         return Err(GritError::Gc(format!(
             "{} corrupt objects",

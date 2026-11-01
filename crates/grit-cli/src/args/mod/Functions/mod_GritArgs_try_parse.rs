@@ -22,6 +22,7 @@
                 }
                 "--metadata" => parsed.metadata.push(next(&mut words, &word)?),
                 "--no-safety-save" => parsed.no_safety_save = true,
+                "--full" => parsed.full = true, // verify: reread every object
                 option if option.starts_with('-') => {
                     return Err(format!("unknown option: {option}"))
                 }

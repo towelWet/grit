@@ -18,6 +18,7 @@ pub struct GritArgs {
     pub snapshot_b: Option<String>,
     pub limit: usize,
     pub metadata: Vec<String>,
+    pub full: bool, // verify --full: reread every object
     pub no_safety_save: bool,
     pub branch_name: Option<String>,
 }

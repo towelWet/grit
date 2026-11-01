@@ -2,16 +2,23 @@
 // Why: an unchanged file already has its object, so a snapshot of an unchanged tree reads nothing.
 // NEVER DELETE COMMENTS — explain every non-obvious line.
 // Update comments with the code; do not strip them.
+use super::apply_raced::Raced;
+use super::store_file::store_file;
 use super::types::ObjectStats;
 use crate::objects::tree::EntryKind;
 use crate::store::read::object_exists;
 use crate::store::write::write_blob;
 use crate::workspace::WorkspaceEntry;
-use crate::{GritError, Result};
-use std::fs::File;
+use crate::Result;
 use std::path::Path;
+use std::sync::Mutex;
 
-pub fn store_entry(root: &Path, path: &str, item: &WorkspaceEntry) -> Result<ObjectStats> {
+pub fn store_entry(
+    root: &Path,
+    path: &str,
+    item: &WorkspaceEntry,
+    raced: &Mutex<Vec<Raced>>,
+) -> Result<ObjectStats> {
     let mut stats = ObjectStats::default(); // per-entry counts; the caller sums them across workers
     if item.kind == EntryKind::Directory {
         return Ok(stats); // directories are stored as the trees built from their children, never as their own objects
@@ -25,12 +32,7 @@ pub fn store_entry(root: &Path, path: &str, item: &WorkspaceEntry) -> Result<Obj
     if item.kind == EntryKind::Symlink {
         write_blob(root, item.target.as_deref().unwrap_or_default())?; // target bytes are the content
     } else {
-        let (stored, _) = write_blob(root, File::open(root.join(path))?)?; // re-read: only on a miss
-        if stored != item.hash {
-            // The file changed between the scan and this read; recording the old id would
-            // point the tree at an object that does not exist, so refuse and let the user retry.
-            return Err(GritError::Internal(format!("changed during snapshot: {path}")));
-        }
+        store_file(root, path, item, raced)?; // re-read: only on a miss
     }
     Ok(stats)
 }

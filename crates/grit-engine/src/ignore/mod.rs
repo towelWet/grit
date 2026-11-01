@@ -1,3 +1,5 @@
+mod generated;
+
 use globset::{Glob, GlobSet, GlobSetBuilder};
 use std::path::Path;
 #[derive(Debug, Clone)]
@@ -29,6 +31,9 @@ impl IgnoreRules {
         }
     }
     pub fn is_ignored(&self, path: &Path) -> bool {
+        if generated::generated(path) {
+            return true; // rebuildable output, at any depth, in every repo
+        }
         if self.inner.is_match(path) {
             return true;
         }
